@@ -22,8 +22,9 @@
 #import "MBProgressHUD.h"
 
 //#error : Define WS Room URI (es. wss://localhost:8443/room)
-static NSString *defaultWsRoom = @"https://kurento.teamlife.it:8443/room";
-static  NSString* const kRoomURLString = @"RoomServerURL";
+static NSString *defaultWsRoom = @"wss://192.168.31.105:4443/openvidu"; //@"https://kurento.teamlife.it:8443/room";
+static NSString *defaultChatUrl = @"https://192.168.31.105:4443";
+static  NSString* const kRoomURLString = @"RoomServerURLT";
 
 @interface NBMRoomMainViewController () <NBMRoomLoginViewCellDelegate>
 
@@ -62,7 +63,8 @@ static  NSString* const kRoomURLString = @"RoomServerURL";
 - (NSString *)roomServerURLString {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *roomURLString = [defaults objectForKey:kRoomURLString];
-    if (!roomURLString) {
+//    if (!roomURLString)
+    {
         roomURLString = defaultWsRoom;
     }
     
@@ -89,6 +91,9 @@ static  NSString* const kRoomURLString = @"RoomServerURL";
     [self saveRoomServerURLString:roomURLString];
     NSURL *roomURL = [NSURL URLWithString:roomURLString];
     self.room = [[NBMRoom alloc] initWithUsername:username roomName:room roomURL:roomURL dataChannels:YES];
+    self.room.restUrl = [NSURL URLWithString:defaultChatUrl];
+    self.room.appName = @"OPENVIDUAPP";
+    self.room.appSec = @"MY_SECRET";
     //[self performSegueWithIdentifier:@"NBMRoomVideoViewController" sender:room];
     NBMRoomVideoViewController *videoVC = [self.storyboard instantiateViewControllerWithIdentifier:@"RoomVideoViewController"];
     videoVC.room = _room;

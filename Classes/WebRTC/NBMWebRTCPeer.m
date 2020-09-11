@@ -42,6 +42,7 @@
 
 typedef void(^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection);
 static NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
+//stun:122.51.62.201:3478
 
 @interface NBMWebRTCPeer () <RTCPeerConnectionDelegate, RTCDataChannelDelegate>
 

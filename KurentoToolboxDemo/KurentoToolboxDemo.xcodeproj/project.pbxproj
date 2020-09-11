@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3BC085B2145E3787FCBBACB7 /* libPods-KurentoToolboxDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8427577B1A2997AC0147152 /* libPods-KurentoToolboxDemo.a */; };
 		4A1985BF1C7C9C4E00AE99DD /* NBMTreeMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A1985BE1C7C9C4E00AE99DD /* NBMTreeMainViewController.m */; };
 		4A1985C21C7C9D3B00AE99DD /* NBMTreeMainViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A1985C11C7C9D3B00AE99DD /* NBMTreeMainViewCell.m */; };
 		4A1985C51C7DFB4600AE99DD /* NBMTreeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A1985C41C7DFB4600AE99DD /* NBMTreeManager.m */; };
@@ -26,7 +27,6 @@
 		4AE438E91BF0DDBB001882E5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4AE438E81BF0DDBB001882E5 /* Assets.xcassets */; };
 		4AE438EC1BF0DDBC001882E5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4AE438EA1BF0DDBC001882E5 /* LaunchScreen.storyboard */; };
 		566A7E931D80161A00283028 /* WebRTC.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 564D8A0C1D18486600676AAC /* WebRTC.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D1F711884E167D3F5CDAFF41 /* libPods-KurentoToolboxDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8427577B1A2997AC0147152 /* libPods-KurentoToolboxDemo.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -94,7 +94,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1F711884E167D3F5CDAFF41 /* libPods-KurentoToolboxDemo.a in Frameworks */,
+				3BC085B2145E3787FCBBACB7 /* libPods-KurentoToolboxDemo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,7 +234,6 @@
 				4AE438D61BF0DDBB001882E5 /* Frameworks */,
 				4AE438D71BF0DDBB001882E5 /* Resources */,
 				29379472A856DA788EB8C5B7 /* [CP] Embed Pods Frameworks */,
-				74D34D164100C4302B620D70 /* [CP] Copy Pods Resources */,
 				564D8A221D19488D00676AAC /* Embed Frameworks */,
 			);
 			buildRules = (
@@ -257,7 +256,8 @@
 				TargetAttributes = {
 					4AE438D81BF0DDBB001882E5 = {
 						CreatedOnToolsVersion = 7.1;
-						DevelopmentTeam = 6DB9556A7S;
+						DevelopmentTeam = QGKWR4BM5D;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.GameCenter = {
 								enabled = 0;
@@ -271,6 +271,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -304,13 +305,16 @@
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KurentoToolboxDemo-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		29379472A856DA788EB8C5B7 /* [CP] Embed Pods Frameworks */ = {
@@ -319,28 +323,16 @@
 			files = (
 			);
 			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KurentoToolboxDemo/Pods-KurentoToolboxDemo-frameworks.sh",
+				"${PODS_ROOT}/../WebRTC.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebRTC.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-KurentoToolboxDemo/Pods-KurentoToolboxDemo-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		74D34D164100C4302B620D70 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-KurentoToolboxDemo/Pods-KurentoToolboxDemo-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KurentoToolboxDemo/Pods-KurentoToolboxDemo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -483,8 +475,9 @@
 			baseConfigurationReference = F13C173A1C1EFFF77D602F55 /* Pods-KurentoToolboxDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Massimo Milazzo (DD85M3RUJX)";
-				DEVELOPMENT_TEAM = 6DB9556A7S;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = QGKWR4BM5D;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -494,8 +487,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = it.telecomitalia.KurentoToolboxDemostration;
 				PRODUCT_NAME = KurentoDemo;
-				PROVISIONING_PROFILE = "97a9f27d-296a-4b93-8389-c799993ff8ae";
-				PROVISIONING_PROFILE_SPECIFIER = KurentoToolbox;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
@@ -504,8 +496,9 @@
 			baseConfigurationReference = 6D6934503747DF5C38C8CDD8 /* Pods-KurentoToolboxDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Massimo Milazzo (DD85M3RUJX)";
-				DEVELOPMENT_TEAM = 6DB9556A7S;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = QGKWR4BM5D;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -515,8 +508,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = it.telecomitalia.KurentoToolboxDemostration;
 				PRODUCT_NAME = KurentoDemo;
-				PROVISIONING_PROFILE = "97a9f27d-296a-4b93-8389-c799993ff8ae";
-				PROVISIONING_PROFILE_SPECIFIER = KurentoToolbox;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;
 		};

@@ -50,9 +50,15 @@ typedef NS_ENUM(NSInteger, NBMRoomErrorCode) {
 - (instancetype)initWithUsername:(NSString *)username roomName:(NSString *)name roomURL:(NSURL *)url dataChannels:(BOOL)dataChannels;
 
 @property (nonatomic, copy, readonly) NSString *name;
-@property (nonatomic, strong, readonly) NSURL *url;
+@property (nonatomic, strong, readonly) NSURL *url; //wss
 @property (nonatomic, copy, readonly) NBMPeer *localPeer;
 @property (nonatomic, strong, readonly) NSSet *peers;
 @property (nonatomic, assign, readonly) BOOL dataChannels;
+
+@property (nonatomic, copy) NSURL *restUrl; //https
+@property (nonatomic, copy) NSString *appName;//OPENVIDUAPP
+@property (nonatomic, copy) NSString *appSec;//MY_SECRET
+
+@property (nonatomic, copy) NSString *token;
 
 @end
