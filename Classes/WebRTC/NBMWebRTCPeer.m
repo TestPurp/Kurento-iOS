@@ -731,6 +731,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
             [peerConnection answerForConstraints:answerConstraints completionHandler:^(RTCSessionDescription * _Nullable sdp, NSError * _Nullable error) {
                 [self peerConnection:peerConnection didSetSessionDescriptionWithError:error];
             }];
+            
             //[peerConnection createAnswerWithDelegate:self constraints:answerConstraints];
         }
         else if (peerConnection.signalingState == RTCSignalingStateStable) {

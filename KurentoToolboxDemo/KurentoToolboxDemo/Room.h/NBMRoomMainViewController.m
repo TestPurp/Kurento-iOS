@@ -22,8 +22,8 @@
 #import "MBProgressHUD.h"
 
 //#error : Define WS Room URI (es. wss://localhost:8443/room)
-static NSString *defaultWsRoom = @"wss://192.168.31.105:4443/openvidu"; //@"https://kurento.teamlife.it:8443/room";
-static NSString *defaultChatUrl = @"https://192.168.31.105:4443";
+static NSString *defaultWsRoom = @"wss://192.168.31.106:4443/openvidu"; //@"https://kurento.teamlife.it:8443/room";
+static NSString *defaultChatUrl = @"https://192.168.31.106:4443";
 static  NSString* const kRoomURLString = @"RoomServerURLT";
 
 @interface NBMRoomMainViewController () <NBMRoomLoginViewCellDelegate>

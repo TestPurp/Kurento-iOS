@@ -556,6 +556,8 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
         }];
     } else {
         NBMPeer *remotePeer = [self peerOfConnection:connection];
+//        [self.webRTCPeer processOffer:sdpOffer.sdp connectionId:connection.connectionId];
+        
         [self.roomClient receiveVideoFromPeer:remotePeer offer:sdpOffer.sdp completion:^(NSString *sdpAnswer, NSError *error) {
             [self.webRTCPeer processAnswer:sdpAnswer connectionId:connection.connectionId];
         }];

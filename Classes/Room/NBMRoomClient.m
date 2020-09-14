@@ -210,7 +210,9 @@ static NSTimeInterval kRoomClientTimeoutInterval = 5;
 - (void)joinRoomWithDataChannels:(BOOL)dataChannels {
     return [self joinRoom:^(NSSet *peers, NSError *error) {
         if ([self.delegate respondsToSelector:@selector(client:didJoinRoom:)]) {
-            [self.delegate client:self didJoinRoom:error];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                               [self.delegate client:self didJoinRoom:error];
+                           });
         }
     } dataChannels:dataChannels];
 }
@@ -398,7 +400,7 @@ static NSTimeInterval kRoomClientTimeoutInterval = 5;
                         NSLog(@"Tinfo: %@", info1);
                         if (info1[@"token"]) {
                             self.room.token = info1[@"token"];
-                            
+
                             NSDictionary *meta = @{ @"clientData": roomName ? : @"" };
                             NSData *metaData = [NSJSONSerialization dataWithJSONObject:meta options:0 error:nil];
                             NSString *metaStr = [[NSString alloc] initWithData:metaData encoding:NSUTF8StringEncoding];
@@ -408,12 +410,12 @@ static NSTimeInterval kRoomClientTimeoutInterval = 5;
 //                                                                        kJoinRoomParam: roomName ? : @"",
 //                                                                         kJoinRoomUserParam: username ? : @"",
 //                                                                         kJoinDataChannelsParam: dataChannels ? @YES : @NO,
-                                                                         @"token": self.room.token,
-                                                                         @"secret": @"",
-                                                                         @"session": roomName ? : @"",
-                                                                         @"platform": @"iOS",
-                                                                         @"metadata": metaStr
-                                                           }
+                                 @"token": self.room.token,
+                                 @"secret": @"",
+                                 @"session": roomName ? : @"",
+                                 @"platform": @"iOS",
+                                 @"metadata": metaStr
+                             }
 
                                                            completion:^(NBMResponse *response) {
                                                                NSError *error;
@@ -503,11 +505,11 @@ static NSTimeInterval kRoomClientTimeoutInterval = 5;
 
 - (void)nbm_publishVideo:(NSString *)sdpOffer loopback:(BOOL)doLoopback completion:(void (^)(NSString *sdpAnswer, NSError *error))block {
     NSDictionary *params = @{ kPublishVideoSdpOfferParam: sdpOffer ? : @"",
-                              @"hasAudio" : @YES,
-                              @"hasVideo" : @YES,
-                              @"audioActive" : @YES,
-                              @"videoActive" : @YES,
-                              @"typeOfVideo" : @"CAMERA",
+                              @"hasAudio": @YES,
+                              @"hasVideo": @YES,
+                              @"audioActive": @YES,
+                              @"videoActive": @YES,
+                              @"typeOfVideo": @"CAMERA",
                               kPublishVideoDoLoopbackParam: @(doLoopback) };
 
     [self.jsonRpcClient sendRequestWithMethod:kPublishVideoMethod
@@ -561,7 +563,7 @@ static NSTimeInterval kRoomClientTimeoutInterval = 5;
 #pragma mark Receive video
 
 - (void)nbm_receiveVideoFromPeer:(NBMPeer *)peer offer:(NSString *)sdpOffer completion:(void (^)(NSString *sdpAnswer, NSError *error))block {
-    NSString *sender = [self senderFromPeer:peer];
+    NSString *sender = peer.streams.allObjects.lastObject; //[self senderFromPeer:peer];
 
     NSDictionary *params = @{ kReceiveVideoSenderParam: sender,
                               kReceiveVideoSdpOfferParam: sdpOffer ? : @"" };
@@ -817,8 +819,8 @@ static NSTimeInterval kRoomClientTimeoutInterval = 5;
     if (peerId) {
         [sender appendString:peerId];
     }
-    [sender appendString:@"_"];
-    [sender appendString:streamId];
+//    [sender appendString:@"_"];
+//    [sender appendString:streamId];
 
     return sender;
 }
