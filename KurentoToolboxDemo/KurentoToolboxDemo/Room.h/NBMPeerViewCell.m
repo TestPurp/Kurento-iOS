@@ -59,7 +59,8 @@
         [self.containerView insertSubview:_videoView aboveSubview:_peerLabel];
         [self showCellSubview:_videoView];
         
-//        [self setNeedsLayout];
+//        [self.containerView bringSubviewToFront:_videoView];
+        [self setNeedsLayout];
     }
 }
 

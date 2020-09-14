@@ -579,7 +579,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
            didAddStream:(RTCMediaStream *)stream {
     NBMPeerConnection *connection = [self wrapperForConnection:peerConnection];
-    DDLogVerbose(@"Peer connection %@ - received %lu video tracks and %lu audio tracks",
+    DDLogVerbose(@"%s, Peer connection %@ - received %lu video tracks and %lu audio tracks", __PRETTY_FUNCTION__, 
                  connection.connectionId, (unsigned long)stream.videoTracks.count, (unsigned long)stream.audioTracks.count);
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!connection) {

@@ -283,7 +283,7 @@ NSString *const kPeerCollectionViewCellIdentifier = @"PeerCollectionViewCellIden
     NSParameterAssert(stream);
     
     id<NBMRenderer> renderer = nil;
-    RTCVideoTrack *videoTrack = [stream.videoTracks firstObject];
+    RTCVideoTrack *videoTrack = [stream.videoTracks lastObject];
     NBMRendererType rendererType = self.mediaConfiguration.rendererType;
     
     if (rendererType == NBMRendererTypeOpenGLES) {
