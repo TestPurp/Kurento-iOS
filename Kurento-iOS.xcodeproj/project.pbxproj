@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		046A86B62510A59A0020D594 /* UIDevice+CrashFix.h in Headers */ = {isa = PBXBuildFile; fileRef = 046A86B42510A59A0020D594 /* UIDevice+CrashFix.h */; };
+		046A86B72510A59A0020D594 /* UIDevice+CrashFix.m in Sources */ = {isa = PBXBuildFile; fileRef = 046A86B52510A59A0020D594 /* UIDevice+CrashFix.m */; };
 		4A29E1731C5A0FD70068FEE5 /* NBMError.h in Headers */ = {isa = PBXBuildFile; fileRef = 4A29E1711C5A0FD70068FEE5 /* NBMError.h */; };
 		4A29E1741C5A0FD70068FEE5 /* NBMError.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A29E1721C5A0FD70068FEE5 /* NBMError.m */; };
 		4A29E1761C5A13D30068FEE5 /* WebRTC.h in Headers */ = {isa = PBXBuildFile; fileRef = 4A29E1751C5A13D30068FEE5 /* WebRTC.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -76,7 +78,6 @@
 		4AE8C9EC1C4FD83300A87D8A /* NBMTreeClientError.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AE8C9EA1C4FD83200A87D8A /* NBMTreeClientError.m */; };
 		4AE8C9ED1C514DB300A87D8A /* NBMTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 4A6E88D91C0F0068000A8EE9 /* NBMTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4AF48D611BECEFFA004E4AD2 /* KurentoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A46BC211BE3DF79009E0FBE /* KurentoToolbox.framework */; };
-		564D8A0B1D18485500676AAC /* WebRTC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 564D8A0A1D18485500676AAC /* WebRTC.framework */; };
 		564D8A141D1942C300676AAC /* libPods-KurentoToolbox-Static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 564D8A131D1942C300676AAC /* libPods-KurentoToolbox-Static.a */; };
 		B898D43D6064172AE17A1A53 /* libPods-KurentoToolbox-Static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A44AD8017DB368676764B11 /* libPods-KurentoToolbox-Static.a */; };
 		CF748A736A49BD58460593DD /* libPods-KurentoToolbox-Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7BDE223912EC939E9DA6EBE1 /* libPods-KurentoToolbox-Tests.a */; };
@@ -94,12 +95,14 @@
 
 /* Begin PBXFileReference section */
 		0258B3B6B7AC9DB8C07F4442 /* Pods-KurentoToolbox-Static.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KurentoToolbox-Static.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KurentoToolbox-Static/Pods-KurentoToolbox-Static.debug.xcconfig"; sourceTree = "<group>"; };
+		046A86B42510A59A0020D594 /* UIDevice+CrashFix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "UIDevice+CrashFix.h"; path = "Internals/UIDevice+CrashFix.h"; sourceTree = "<group>"; };
+		046A86B52510A59A0020D594 /* UIDevice+CrashFix.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "UIDevice+CrashFix.m"; path = "Internals/UIDevice+CrashFix.m"; sourceTree = "<group>"; };
 		1C50AB454FC480CBB30F5059 /* Pods-KurentoToolbox-Static.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KurentoToolbox-Static.release.xcconfig"; path = "Pods/Target Support Files/Pods-KurentoToolbox-Static/Pods-KurentoToolbox-Static.release.xcconfig"; sourceTree = "<group>"; };
 		4A0C9E891BD8DFCE00F4F7F0 /* NBMJSONRPCConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = NBMJSONRPCConstants.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4A133A4F1BE1204A0095B168 /* KurentoToolbox.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = KurentoToolbox.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4A29E1711C5A0FD70068FEE5 /* NBMError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = NBMError.h; sourceTree = "<group>"; };
 		4A29E1721C5A0FD70068FEE5 /* NBMError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = NBMError.m; sourceTree = "<group>"; };
-		4A29E1751C5A13D30068FEE5 /* WebRTC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WebRTC.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		4A29E1751C5A13D30068FEE5 /* WebRTC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WebRTC.h; sourceTree = "<group>"; };
 		4A29E1781C5A31AE0068FEE5 /* JSON-RPC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "JSON-RPC.h"; sourceTree = "<group>"; };
 		4A29E17A1C5A339D0068FEE5 /* Room.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Room.h; sourceTree = "<group>"; };
 		4A29E17C1C5A33E50068FEE5 /* Tree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tree.h; path = Tree/Tree.h; sourceTree = "<group>"; };
@@ -174,7 +177,6 @@
 		4AE8C9EA1C4FD83200A87D8A /* NBMTreeClientError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NBMTreeClientError.m; path = Tree/Internals/NBMTreeClientError.m; sourceTree = "<group>"; };
 		4AF48D5C1BECEFFA004E4AD2 /* KurentoToolbox-Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "KurentoToolbox-Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4AF48D601BECEFFA004E4AD2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		564D8A0A1D18485500676AAC /* WebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = WebRTC.framework; sourceTree = "<group>"; };
 		564D8A131D1942C300676AAC /* libPods-KurentoToolbox-Static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libPods-KurentoToolbox-Static.a"; path = "Pods/../build/Debug-iphoneos/libPods-KurentoToolbox-Static.a"; sourceTree = "<group>"; };
 		7BDE223912EC939E9DA6EBE1 /* libPods-KurentoToolbox-Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KurentoToolbox-Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A44AD8017DB368676764B11 /* libPods-KurentoToolbox-Static.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KurentoToolbox-Static.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -187,7 +189,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				564D8A0B1D18485500676AAC /* WebRTC.framework in Frameworks */,
 				4A6E88DF1C105435000A8EE9 /* UIKit.framework in Frameworks */,
 				4A6E88DD1C10542D000A8EE9 /* Foundation.framework in Frameworks */,
 				564D8A141D1942C300676AAC /* libPods-KurentoToolbox-Static.a in Frameworks */,
@@ -317,6 +318,8 @@
 				4AE8C9C91C47B83700A87D8A /* NBMEAGLVideoViewContainer.m */,
 				4AD22D201C643313002C1038 /* RTCMediaStream+Configuration.h */,
 				4AD22D211C643313002C1038 /* RTCMediaStream+Configuration.m */,
+				046A86B42510A59A0020D594 /* UIDevice+CrashFix.h */,
+				046A86B52510A59A0020D594 /* UIDevice+CrashFix.m */,
 			);
 			path = WebRTC;
 			sourceTree = "<group>";
@@ -397,7 +400,6 @@
 			isa = PBXGroup;
 			children = (
 				564D8A131D1942C300676AAC /* libPods-KurentoToolbox-Static.a */,
-				564D8A0A1D18485500676AAC /* WebRTC.framework */,
 				4A4F0C8F1C158B5300CD30A1 /* CoreMedia.framework */,
 				4A6E88DE1C105435000A8EE9 /* UIKit.framework */,
 				4A6E88DC1C10542D000A8EE9 /* Foundation.framework */,
@@ -434,6 +436,7 @@
 				4AE8C9EB1C4FD83300A87D8A /* NBMTreeClientError.h in Headers */,
 				4AE4390A1BF4AC14001882E5 /* NBMTimeoutable.h in Headers */,
 				4A29E1761C5A13D30068FEE5 /* WebRTC.h in Headers */,
+				046A86B62510A59A0020D594 /* UIDevice+CrashFix.h in Headers */,
 				4A3BBFFA1C0CA34E00D9887F /* NBMMediaConfiguration.h in Headers */,
 				4AE8C9E51C4E752900A87D8A /* NBMTreeEndpoint.h in Headers */,
 				4AE439031BF4ABEE001882E5 /* NBMResponse+Private.h in Headers */,
@@ -614,7 +617,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-KurentoToolbox-Tests/Pods-KurentoToolbox-Tests-frameworks.sh",
-				"${PODS_ROOT}/../WebRTC.framework",
+				"${PODS_ROOT}/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -652,6 +655,7 @@
 				4AD22D231C643313002C1038 /* RTCMediaStream+Configuration.m in Sources */,
 				4AE8C9EC1C4FD83300A87D8A /* NBMTreeClientError.m in Sources */,
 				4A29E1741C5A0FD70068FEE5 /* NBMError.m in Sources */,
+				046A86B72510A59A0020D594 /* UIDevice+CrashFix.m in Sources */,
 				4A6E88EB1C10637B000A8EE9 /* NBMPeer.m in Sources */,
 				4A4F0C9C1C15C7B000CD30A1 /* NBMRoomError.m in Sources */,
 				4A46BC461BE3E2CA009E0FBE /* NBMResponse.m in Sources */,

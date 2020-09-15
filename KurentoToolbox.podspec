@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.license      = { :type => "GNU LGPL 2.1", :file => "LICENSE" }
 
   s.author = { "Marco Rossi" => "marco5.rossi@guest.telecomitalia.it" }
-  s.platform = :ios, "8.0"
+  s.platform = :ios, "9.0"
 
   s.source       = { :git => "https://github.com/nubomediaTI/Kurento-iOS.git", :tag => "v#{s.version}" }
 
@@ -23,7 +23,9 @@ Pod::Spec.new do |s|
     ss.dependency 'KurentoToolbox/JSON-RPC'
     ss.dependency 'KurentoToolbox/Room'
     ss.dependency 'KurentoToolbox/Tree'
-    ss.ios.vendored_frameworks = 'WebRTC.framework'
+#    ss.ios.vendored_frameworks = 'WebRTC.framework'
+    ss.dependency 'GoogleWebRTC'
+    
   end
 
   s.subspec 'WebRTC' do |ss|

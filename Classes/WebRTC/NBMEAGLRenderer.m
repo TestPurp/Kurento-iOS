@@ -22,7 +22,7 @@
 #import <WebRTC/RTCEAGLVideoView.h>
 #import <WebRTC/RTCVideoTrack.h>
 
-@interface NBMEAGLRenderer() <RTCEAGLVideoViewDelegate>
+@interface NBMEAGLRenderer() <RTCVideoViewDelegate>
 
 @property (nonatomic, strong) NBMEAGLVideoViewContainer *containerView;
 @property (nonatomic, strong) RTCEAGLVideoView *openGLView;

@@ -27,18 +27,19 @@
 #import "RTCMediaStream+Configuration.h"
 
 //Web-RTC classes
-#import <WebRTC/RTCConfiguration.h>
-#import <WebRTC/RTCMediaConstraints.h>
-#import <WebRTC/RTCMediaStream.h>
-#import <WebRTC/RTCIceServer.h>
-#import <WebRTC/RTCPeerConnection.h>
-#import <WebRTC/RTCPeerConnectionFactory.h>
-#import <WebRTC/RTCSessionDescription.h>
-#import <WebRTC/RTCVideoTrack.h>
-#import <WebRTC/RTCAudioTrack.h>
-#import <WebRTC/RTCAVFoundationVideoSource.h>
-#import <WebRTC/RTCDataChannelConfiguration.h>
-#import <WebRTC/RTCDataChannel.h>
+//#import <WebRTC/RTCConfiguration.h>
+//#import <WebRTC/RTCMediaConstraints.h>
+//#import <WebRTC/RTCMediaStream.h>
+//#import <WebRTC/RTCIceServer.h>
+//#import <WebRTC/RTCPeerConnection.h>
+//#import <WebRTC/RTCPeerConnectionFactory.h>
+//#import <WebRTC/RTCSessionDescription.h>
+//#import <WebRTC/RTCVideoTrack.h>
+//#import <WebRTC/RTCAudioTrack.h>
+//#import <WebRTC/RTCAVFoundationVideoSource.h>
+//#import <WebRTC/RTCDataChannelConfiguration.h>
+//#import <WebRTC/RTCDataChannel.h>
+@import WebRTC;
 
 typedef void(^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection);
 static NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
@@ -53,6 +54,8 @@ static NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
 @property (nonatomic, strong) RTCDataChannel *dataChannel;
 @property (nonatomic, strong) RTCMediaStream *localStream;
 @property (nonatomic, assign, readwrite) NBMCameraPosition cameraPosition;
+
+@property (nonatomic, strong) RTCCameraVideoCapturer *capturer;
 
 @property (nonatomic, copy) SdpOfferBlock offerBlock;
 
@@ -231,6 +234,8 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
     
 //    self.localPeerConnection = nil;
     
+    [self.capturer stopCapture];
+    self.capturer = nil;
     [self.localStream removeAudioTrack:[self.localStream.audioTracks firstObject]];
     [self.localStream removeVideoTrack:[self.localStream.videoTracks firstObject]];
     
@@ -466,15 +471,41 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
     NSString *cameraId = [self cameraDevice:self.cameraPosition];
     
     NSAssert(cameraId, @"Unable to get camera id");
-    
-    RTCAVFoundationVideoSource* videoSource = [self.peerConnectionFactory avFoundationVideoSourceWithConstraints:videoConstraints];
-    if (self.cameraPosition == NBMCameraPositionBack) {
-        [videoSource setUseBackCamera:YES];
+    RTCVideoTrack *localVideoTrack = nil;
+
+    if (!_capturer) {
+        RTCVideoSource *videoSource = [self.peerConnectionFactory videoSource];
+        _capturer = [[RTCCameraVideoCapturer alloc] initWithDelegate:videoSource];
+        localVideoTrack = [self.peerConnectionFactory videoTrackWithSource:videoSource trackId:[self videoTrackId]];
+    } else {
+        localVideoTrack = [self.peerConnectionFactory videoTrackWithSource:_capturer.delegate trackId:[self videoTrackId]];
     }
     
-    RTCVideoTrack *videoTrack = [self.peerConnectionFactory videoTrackWithSource:videoSource trackId:[self videoTrackId]];
+    AVCaptureDevice *device;
+    for (AVCaptureDevice *captureDevice in
+         [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
+        if (captureDevice.localizedName == cameraId) {
+            device = captureDevice;
+            break;
+        }
+    }
+    AVCaptureDeviceFormat *format = [[RTCCameraVideoCapturer supportedFormatsForDevice:device] lastObject];
+
+    __weak NBMWebRTCPeer *ws = self;
+    [_capturer stopCaptureWithCompletionHandler:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [ws.capturer startCaptureWithDevice:device format:format fps:30];
+        });
+    }];
     
-    return videoTrack;
+//    RTCAVFoundationVideoSource* videoSource = [self.peerConnectionFactory avFoundationVideoSourceWithConstraints:videoConstraints];
+//    if (self.cameraPosition == NBMCameraPositionBack) {
+//        [videoSource setUseBackCamera:YES];
+//    }
+    
+//    RTCVideoTrack *videoTrack = [self.peerConnectionFactory videoTrackWithSource:videoSource trackId:[self videoTrackId]];
+    
+    return localVideoTrack;
 }
 
 - (NSString *)cameraDevice:(NBMCameraPosition)cameraPosition
@@ -579,7 +610,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
            didAddStream:(RTCMediaStream *)stream {
     NBMPeerConnection *connection = [self wrapperForConnection:peerConnection];
-    DDLogVerbose(@"%s, Peer connection %@ - received %lu video tracks and %lu audio tracks", __PRETTY_FUNCTION__, 
+    DDLogVerbose(@"%s, Peer connection %@ - received %lu video tracks and %lu audio tracks", __PRETTY_FUNCTION__,
                  connection.connectionId, (unsigned long)stream.videoTracks.count, (unsigned long)stream.audioTracks.count);
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!connection) {
