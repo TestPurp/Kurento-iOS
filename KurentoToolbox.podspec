@@ -32,6 +32,7 @@ Pod::Spec.new do |s|
     ss.source_files = 'Classes/WebRTC/**/*.{h,m}'
     ss.public_header_files = 'Classes/WebRTC/*.h'
     ss.dependency 'KurentoToolbox/Utils'
+    ss.dependency 'GoogleWebRTC'
   end
 
   s.subspec 'JSON-RPC' do |ss|
