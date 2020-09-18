@@ -256,7 +256,8 @@ typedef void(^ErrorBlock)(NSError *error);
 
 - (void)setupWebRTCSession {
     NBMMediaConfiguration *defaultConfig = [NBMMediaConfiguration defaultConfiguration];
-    NBMWebRTCPeer *webRTCManager = [[NBMWebRTCPeer alloc] initWithDelegate:self configuration:defaultConfig];
+    NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
+    NBMWebRTCPeer *webRTCManager = [[NBMWebRTCPeer alloc] initWithDelegate:self configuration:defaultConfig stunServers:@[kDefaultSTUNServerUrl]];
     
     if (!webRTCManager) {
         NSError *retryError = [NSError errorWithDomain:@"it.nubomedia.NBMRoomManager"

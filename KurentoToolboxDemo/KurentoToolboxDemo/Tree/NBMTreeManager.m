@@ -21,8 +21,8 @@
 #import "Reachability.h"
 
 static NSUInteger kConnectionMaxIceAttempts = 3;
-typedef void(^ErrorBlock)(NSError *error);
-static NSString* const kConnectionId = @"connection";
+typedef void (^ErrorBlock)(NSError *error);
+static NSString *const kConnectionId = @"connection";
 
 @interface NBMTreeManager () <NBMWebRTCPeerDelegate, NBMTreeClientDelegate>
 
@@ -39,7 +39,8 @@ static NSString* const kConnectionId = @"connection";
 
 @implementation NBMTreeManager
 
-- (instancetype)initWithTreeURL:(NSURL *)treeURL delegate:(id<NBMTreeManagerDelegate>)delegate; {
+- (instancetype)initWithTreeURL:(NSURL *)treeURL delegate:(id<NBMTreeManagerDelegate>)delegate;
+{
     self = [super init];
     if (self) {
         _treeClient = [[NBMTreeClient alloc] initWithURL:treeURL delegate:self];
@@ -64,9 +65,9 @@ static NSString* const kConnectionId = @"connection";
         BOOL hasMediaStarted = [weakSelf.webRTCPeer startLocalMedia];
         if (hasMediaStarted) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                RTCMediaStream *localStream = weakSelf.webRTCPeer.localStream;
-                [self.delegate treeManager:self didAddLocalStream:localStream];
-            });
+                               RTCMediaStream *localStream = weakSelf.webRTCPeer.localStream;
+                               [self.delegate treeManager:self didAddLocalStream:localStream];
+                           });
             [weakSelf.webRTCPeer generateOffer:kConnectionId completion:^(NSString *sdpOffer, NBMPeerConnection *connection) {
                 [weakSelf.treeClient setSource:sdpOffer tree:treeId completion:^(NSString *sdpAnswer, NSError *error) {
                     if (sdpAnswer) {
@@ -78,8 +79,7 @@ static NSString* const kConnectionId = @"connection";
                     }
                 }];
             }];
-        }
-        else {
+        } else {
             //Error media not started?
             if (block) {
                 block(nil);
@@ -103,7 +103,7 @@ static NSString* const kConnectionId = @"connection";
 - (void)startViewingTree:(NSString *)treeId completion:(void (^)(NSError *))block {
     NSParameterAssert(treeId);
     _mutableCandidates = [NSMutableArray array];
-     __weak typeof(self) weakSelf = self;
+    __weak typeof(self) weakSelf = self;
     [self.webRTCPeer generateOffer:kConnectionId completion:^(NSString *sdpOffer, NBMPeerConnection *connection) {
         [weakSelf.treeClient addSink:sdpOffer tree:treeId completion:^(NBMTreeEndpoint *endpoint, NSError *error) {
             if (endpoint) {
@@ -127,8 +127,7 @@ static NSString* const kConnectionId = @"connection";
                 block(error);
             }
         }];
-    }
-    else {
+    } else {
         if (block) {
             block(nil);
         }
@@ -183,33 +182,34 @@ static NSString* const kConnectionId = @"connection";
 }
 
 - (void)setupWebRTCSession {
+    NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
     NBMMediaConfiguration *defaultConfig = [NBMMediaConfiguration defaultConfiguration];
-    NBMWebRTCPeer *webRTCManager = [[NBMWebRTCPeer alloc] initWithDelegate:self configuration:defaultConfig];
-    
+    NBMWebRTCPeer *webRTCManager = [[NBMWebRTCPeer alloc] initWithDelegate:self configuration:defaultConfig stunServers:@[kDefaultSTUNServerUrl]];
+
     if (!webRTCManager) {
         NSError *retryError = [NSError errorWithDomain:@"it.nubomedia.NBMTreeManager"
                                                   code:0
-                                              userInfo:@{NSLocalizedDescriptionKey: @"Impossible to setup local media stream, check AUDIO & VIDEO permission"}];
+                                              userInfo:@{ NSLocalizedDescriptionKey: @"Impossible to setup local media stream, check AUDIO & VIDEO permission" }];
         [self.delegate treeManager:self didFailWithError:retryError];
         return;
     }
-    
+
     self.webRTCPeer = webRTCManager;
 }
 
 - (void)setupReachability
 {
     self.reachability = [Reachability reachabilityWithHostName:[self.treeClient.url absoluteString]];
-    
+
     __weak typeof(self) weakSelf = self;
-    
+
     self.reachability.reachableBlock = ^(Reachability *reach) {
         DDLogDebug(@"REACHABLE: connected %@", weakSelf.isConnected ? @"YES" : @"NO");
         if (weakSelf.treeClient.connectionState == NBMTreeClientConnectionStateClosed) {
             [weakSelf.treeClient connect];
         }
     };
-    
+
     [self.reachability startNotifier];
 }
 
@@ -239,8 +239,7 @@ static NSString* const kConnectionId = @"connection";
 - (void)client:(NBMTreeClient *)client isConnected:(BOOL)connected {
     if (connected) {
         self.retryCount = 0;
-    }
-    else {
+    } else {
         [self manageTreeClientConnection];
     }
 }
@@ -248,16 +247,15 @@ static NSString* const kConnectionId = @"connection";
 - (void)manageTreeClientConnection {
     BOOL isReachable = self.reachability.isReachable;
     BOOL retryAllowed = self.retryCount < kConnectionMaxIceAttempts;
-    
+
     if (retryAllowed && isReachable) {
         self.retryCount++;
         [self.treeClient connect];
-    }
-    else if (!retryAllowed || !isReachable) {
+    } else if (!retryAllowed || !isReachable) {
         DDLogInfo(@"Impossible to establish connection");
         NSError *retryError = [NSError errorWithDomain:@"it.nubomedia.NBMTreeManager"
                                                   code:0
-                                              userInfo:@{NSLocalizedDescriptionKey: @"Impossible to establish WebSocket connection to Tree Server, check internet connection"}];
+                                              userInfo:@{ NSLocalizedDescriptionKey: @"Impossible to establish WebSocket connection to Tree Server, check internet connection" }];
         [self.delegate treeManager:self didFailWithError:retryError];
     }
 }
@@ -289,8 +287,7 @@ static NSString* const kConnectionId = @"connection";
     NSString *sinkId = self.localViewer.identifier;
     if (treeId && sinkId) {
         [self.treeClient sendICECandidate:candidate forSink:sinkId tree:treeId completion:nil];
-    }
-    else {
+    } else {
         [self.mutableCandidates addObject:candidate];
     }
 }

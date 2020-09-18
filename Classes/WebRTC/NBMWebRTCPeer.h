@@ -18,7 +18,8 @@
 #import <Foundation/Foundation.h>
 
 #import "NBMTypes.h"
-#import <WebRTC/RTCPeerConnection.h>
+
+#import <WebRTC/WebRTC.h>
 
 @class NBMWebRTCPeer;
 @class NBMMediaConfiguration;
@@ -122,7 +123,7 @@
  *
  *  @return An initialized Web RTC peer manager.
  */
-- (instancetype)initWithDelegate:(id<NBMWebRTCPeerDelegate>)delegate configuration:(NBMMediaConfiguration *)configuration;
+- (instancetype)initWithDelegate:(id<NBMWebRTCPeerDelegate>)delegate configuration:(NBMMediaConfiguration *)configuration stunServers:(NSArray<NSString *> *)servers;
 
 /**
  *  Create a new offer for connection with specified identifier.

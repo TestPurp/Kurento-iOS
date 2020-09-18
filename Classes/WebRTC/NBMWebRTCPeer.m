@@ -26,23 +26,8 @@
 
 #import "RTCMediaStream+Configuration.h"
 
-//Web-RTC classes
-//#import <WebRTC/RTCConfiguration.h>
-//#import <WebRTC/RTCMediaConstraints.h>
-//#import <WebRTC/RTCMediaStream.h>
-//#import <WebRTC/RTCIceServer.h>
-//#import <WebRTC/RTCPeerConnection.h>
-//#import <WebRTC/RTCPeerConnectionFactory.h>
-//#import <WebRTC/RTCSessionDescription.h>
-//#import <WebRTC/RTCVideoTrack.h>
-//#import <WebRTC/RTCAudioTrack.h>
-//#import <WebRTC/RTCAVFoundationVideoSource.h>
-//#import <WebRTC/RTCDataChannelConfiguration.h>
-//#import <WebRTC/RTCDataChannel.h>
-@import WebRTC;
-
-typedef void(^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection);
-static NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
+typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection);
+//static NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
 //stun:122.51.62.201:3478
 
 @interface NBMWebRTCPeer () <RTCPeerConnectionDelegate, RTCDataChannelDelegate>
@@ -58,6 +43,7 @@ static NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
 @property (nonatomic, strong) RTCCameraVideoCapturer *capturer;
 
 @property (nonatomic, copy) SdpOfferBlock offerBlock;
+@property (nonatomic, copy) NSArray<NSString *> *defaultServers;
 
 @end
 
@@ -65,26 +51,27 @@ static NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
 
 #pragma mark - Public
 
-- (instancetype)initWithDelegate:(id<NBMWebRTCPeerDelegate>)delegate configuration:(NBMMediaConfiguration *)configuration
+- (instancetype)initWithDelegate:(id<NBMWebRTCPeerDelegate>)delegate configuration:(NBMMediaConfiguration *)configuration stunServers:(NSArray<NSString *> *)servers
 {
     self = [super init];
-    
+
     if (self) {
         _delegate = delegate;
         _mediaConfiguration = configuration;
-        //[RTCPeerConnectionFactory initialize];
+
         _peerConnectionFactory = [[RTCPeerConnectionFactory alloc] init];
+        self.defaultServers = servers;
         _iceServers = [NSMutableArray arrayWithObject:[self defaultSTUNServer]];
         _connectionMap = [NSMutableDictionary dictionary];
     }
-    
+
     return self;
 }
 
 - (void)processOffer:(NSString *)sdpOffer connectionId:(NSString *)connectionId {
     NSParameterAssert(sdpOffer);
     NSParameterAssert(connectionId);
-    
+
     NBMPeerConnection *connection = self.connectionMap[connectionId];
     //    if (connection) {
     //        DDLogWarn(@"Connection already exixts - id: %@", connectionId);
@@ -96,18 +83,18 @@ static NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
     connection.isInitiator = NO;
 
     RTCSessionDescription *description = [[RTCSessionDescription alloc] initWithType:RTCSdpTypeOffer sdp:sdpOffer];
-    __block __weak RTCPeerConnection* peerConnection = connection.peerConnection;
-    [connection.peerConnection setRemoteDescription:description completionHandler:^(NSError * _Nullable error) {
+    __block __weak RTCPeerConnection *peerConnection = connection.peerConnection;
+    [connection.peerConnection setRemoteDescription:description completionHandler:^(NSError *_Nullable error) {
         [self peerConnection:peerConnection didSetSessionDescriptionWithError:error];
     }];
     //[connection.peerConnection setRemoteDescriptionWithDelegate:self sessionDescription:description];
-    
+
     self.connectionMap[connectionId] = connection;
-    
+
     //TODO:Renegotiate active connections
 }
 
-- (void)generateOffer:(NSString *)connectionId completion:(void(^)(NSString *sdpOffer, NBMPeerConnection *connection))block {
+- (void)generateOffer:(NSString *)connectionId completion:(void (^)(NSString *sdpOffer, NBMPeerConnection *connection))block {
     [self generateOffer:connectionId withDataChannels:NO completion:block];
 }
 
@@ -115,18 +102,18 @@ static NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
     [self generateOffer:connectionId withDataChannels:NO];
 }
 
-- (void)generateOffer:(NSString *)connectionId withDataChannels:(BOOL)dataChannels completion:(void(^)(NSString *sdpOffer, NBMPeerConnection *connection))block {
+- (void)generateOffer:(NSString *)connectionId withDataChannels:(BOOL)dataChannels completion:(void (^)(NSString *sdpOffer, NBMPeerConnection *connection))block {
     self.offerBlock = block;
     [self generateOffer:connectionId withDataChannels:dataChannels];
 }
 
 - (void)generateOffer:(NSString *)connectionId withDataChannels:(BOOL)dataChannels {
     NSParameterAssert(connectionId);
-    
+
 //    if (!self.localStream) {
 //        [self startLocalMedia];
 //    }
-   
+
     NBMPeerConnection *connection = self.connectionMap[connectionId];
 //    if (connection) {
 //        DDLogWarn(@"Connection already exixts - id: %@", connectionId);
@@ -137,14 +124,14 @@ static NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
     }
     connection.isInitiator = YES;
     RTCMediaConstraints *constraints = [NBMSessionDescriptionFactory offerConstraints];
-    __block RTCPeerConnection* peerConnection = connection.peerConnection;
-    
+    __block RTCPeerConnection *peerConnection = connection.peerConnection;
+
     BOOL isLocalPeerConnection = [[self.connectionMap allKeys] count] == 0;
     if (!self.localPeerConnection && isLocalPeerConnection) {
         self.localPeerConnection = connection;
-        
+
         if (dataChannels) {
-            RTCDataChannelConfiguration* config = [[RTCDataChannelConfiguration alloc] init];
+            RTCDataChannelConfiguration *config = [[RTCDataChannelConfiguration alloc] init];
             config.isNegotiated = NO;
             NSString *label = @"webcam_0";
             _dataChannel = [peerConnection dataChannelForLabel:label configuration:config];
@@ -152,43 +139,42 @@ static NSString *kDefaultSTUNServerUrl = @"stun:stun.l.google.com:19302";
         }
     }
 
-    [connection.peerConnection offerForConstraints:constraints completionHandler:^(RTCSessionDescription * _Nullable sdp, NSError * _Nullable error) {
+    [connection.peerConnection offerForConstraints:constraints completionHandler:^(RTCSessionDescription *_Nullable sdp, NSError *_Nullable error) {
         [self peerConnection:peerConnection didCreateSessionDescription:sdp error:error];
     }];
     //[connection.peerConnection createOfferWithDelegate:self constraints:constraints];
 
     self.connectionMap[connectionId] = connection;
-    
+
     //TODO:Renegotiate active connections
 }
 
 /** The data channel state changed. */
 - (void)dataChannelDidChangeState:(RTCDataChannel *)dataChannel {
     DDLogVerbose(@"Data channel changed state: @%, %@", dataChannel.label, dataChannel.readyState);
-    
+
     if (dataChannel.readyState == RTCDataChannelStateOpen) {
         [self.delegate webRTCPeer:self didAddDataChannel:dataChannel];
     }
 }
 
 /** The data channel successfully received a data buffer. */
-- (void)dataChannel:(RTCDataChannel *)dataChannel
-didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
-    
+- (void)            dataChannel:(RTCDataChannel *)dataChannel
+    didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 }
 
 //- (void)generateOffer:(NSString *)connectionId restartICE:(BOOL)restart {
-//    
+//
 //}
 
 - (void)processAnswer:(NSString *)sdpAnswer connectionId:(NSString *)connectionId {
     //NSParameterAssert(sdpAnswer);
     NSParameterAssert(connectionId);
-    
+
     NBMPeerConnection *connection = self.connectionMap[connectionId];
-    __block __weak RTCPeerConnection* peerConnection = connection.peerConnection;
+    __block __weak RTCPeerConnection *peerConnection = connection.peerConnection;
     RTCSessionDescription *description = [[RTCSessionDescription alloc] initWithType:RTCSdpTypeAnswer sdp:sdpAnswer];
-    [connection.peerConnection setRemoteDescription:description completionHandler:^(NSError * _Nullable error) {
+    [connection.peerConnection setRemoteDescription:description completionHandler:^(NSError *_Nullable error) {
         [self peerConnection:peerConnection didSetSessionDescriptionWithError:error];
     }];
     //[connection.peerConnection setRemoteDescriptionWithDelegate:self sessionDescription:description];
@@ -197,7 +183,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 - (void)addICECandidate:(RTCIceCandidate *)candidate connectionId:(NSString *)connectionId {
     NSParameterAssert(candidate);
     NSParameterAssert(connectionId);
-    
+
     NBMPeerConnection *connection = self.connectionMap[connectionId];
     [connection addIceCandidate:candidate];
 }
@@ -208,19 +194,19 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 
 - (void)closeConnectionWithConnectionId:(NSString *)connectionId {
     NSParameterAssert(connectionId);
-    
+
     NBMPeerConnection *connection = self.connectionMap[connectionId];
     if (!connection) {
         DDLogWarn(@"No connection to close with id: %@", connectionId);
         return;
     }
-    
+
     RTCMediaStream *remoteStream = connection.remoteStream;
     [connection close];
     if (remoteStream) {
         [self.delegate webRTCPeer:self didRemoveStream:remoteStream ofConnection:connection];
     }
-    
+
     [self.connectionMap removeObjectForKey:connectionId];
 }
 
@@ -231,17 +217,16 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 //        [connection close];
 //    }
 //    [self.connectionMap removeAllObjects];
-    
+
 //    self.localPeerConnection = nil;
-    
+
     [self.capturer stopCapture];
     self.capturer = nil;
     [self.localStream removeAudioTrack:[self.localStream.audioTracks firstObject]];
     [self.localStream removeVideoTrack:[self.localStream.videoTracks firstObject]];
-    
+
     self.localStream = nil;
 }
-
 
 - (NBMCameraPosition)cameraPosition {
     return self.mediaConfiguration.cameraPosition;
@@ -288,46 +273,46 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 
 - (BOOL)videoAuthorized {
     AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-    if(authStatus == AVAuthorizationStatusAuthorized) {
+    if (authStatus == AVAuthorizationStatusAuthorized) {
         // do your logic
         return YES;
-    } else if(authStatus == AVAuthorizationStatusDenied){
+    } else if (authStatus == AVAuthorizationStatusDenied) {
         // denied
-    } else if(authStatus == AVAuthorizationStatusRestricted){
+    } else if (authStatus == AVAuthorizationStatusRestricted) {
         // restricted, normally won't happen
-    } else if(authStatus == AVAuthorizationStatusNotDetermined){
+    } else if (authStatus == AVAuthorizationStatusNotDetermined) {
         // not determined?!
     }
-    
+
     return NO;
 }
 
 - (BOOL)audioAuthorized {
     AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio];
-    if(authStatus == AVAuthorizationStatusAuthorized) {
+    if (authStatus == AVAuthorizationStatusAuthorized) {
         // do your logic
         return YES;
-    } else if(authStatus == AVAuthorizationStatusDenied){
+    } else if (authStatus == AVAuthorizationStatusDenied) {
         // denied
-    } else if(authStatus == AVAuthorizationStatusRestricted){
+    } else if (authStatus == AVAuthorizationStatusRestricted) {
         // restricted, normally won't happen
-    } else if(authStatus == AVAuthorizationStatusNotDetermined){
+    } else if (authStatus == AVAuthorizationStatusNotDetermined) {
         // not determined?!
     }
-    
+
     return NO;
 }
 
 - (NSArray *)activeConnections
 {
-    NSSet *keys = [self.connectionMap keysOfEntriesPassingTest:^BOOL(NSString *connectionId, NBMPeerConnection *connection, BOOL *stop) {
+    NSSet *keys = [self.connectionMap keysOfEntriesPassingTest:^BOOL (NSString *connectionId, NBMPeerConnection *connection, BOOL *stop) {
         RTCPeerConnection *rtcConnection = connection.peerConnection;
         if (rtcConnection.signalingState == RTCSignalingStateStable && rtcConnection.iceConnectionState != RTCIceConnectionStateFailed) {
             return YES;
         }
         return NO;
     }];
-    
+
     return [self.connectionMap objectsForKeys:[keys allObjects] notFoundMarker:[NSNull null]];
 }
 
@@ -345,7 +330,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 
 - (NBMPeerConnection *)connectionWrapperWithConnectionId:(NSString *)connectionId servers:(NSArray *)iceServers {
     NSParameterAssert(connectionId);
-    
+
     RTCPeerConnection *connection = nil;
 //    if (iceServers) {
 //        connection = [self peerConnectionWithServers:iceServers];
@@ -353,7 +338,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
     connection = [self peerConnectionWithServers:iceServers];
     NBMPeerConnection *connectionWrapper = [[NBMPeerConnection alloc] initWithConnection:connection];
     connectionWrapper.connectionId = connectionId;
-    
+
     return connectionWrapper;
 }
 
@@ -362,11 +347,11 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
     RTCConfiguration *config = [[RTCConfiguration alloc] init];
     [config setIceServers:iceServers];
     RTCPeerConnection *connection = [self.peerConnectionFactory peerConnectionWithConfiguration:config constraints:constraints delegate:self];
-    
+
     if (self.localStream) {
         [connection addStream:self.localStream];
     }
-    
+
     return connection;
 }
 
@@ -374,14 +359,14 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 {
     NBMPeerConnection *connectionWrapper = nil;
     NSArray *connectionWrappers = [self.connectionMap allValues];
-    
+
     for (NBMPeerConnection *wrapper in connectionWrappers) {
         if ([wrapper.peerConnection isEqual:connection]) {
             connectionWrapper = wrapper;
             break;
         }
     }
-    
+
     return connectionWrapper;
 }
 
@@ -401,7 +386,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 {
     RTCMediaStream *localMediaStream = [_peerConnectionFactory mediaStreamWithStreamId:[self localStreamLabel]];
     self.localStream = localMediaStream;
-    
+
     //Audio setup
     BOOL audioEnabled = NO;
     AVAuthorizationStatus audioAuthStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio];
@@ -409,7 +394,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
         audioEnabled = YES;
         [self setupLocalAudio];
     }
-    
+
     //Video setup
     BOOL videoEnabled = NO;
     // The iOS simulator doesn't provide any sort of camera capture
@@ -421,9 +406,9 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
         videoEnabled = YES;
         [self setupLocalVideo];
     }
-    
+
 #endif
-    
+
     return audioEnabled && videoEnabled;
 }
 
@@ -431,7 +416,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 {
     RTCMediaStream *localMediaStream = [_peerConnectionFactory mediaStreamWithStreamId:[self localStreamLabel]];
     self.localStream = localMediaStream;
-    
+
     //Audio setup
     [self setupLocalAudio];
 
@@ -441,7 +426,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 #if !TARGET_IPHONE_SIMULATOR
     //Video setup
     [self setupLocalVideo];
-    
+
 #endif
 }
 
@@ -469,7 +454,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 
 - (RTCVideoTrack *)localVideoTrackWithConstraints:(RTCMediaConstraints *)videoConstraints {
     NSString *cameraId = [self cameraDevice:self.cameraPosition];
-    
+
     NSAssert(cameraId, @"Unable to get camera id");
     RTCVideoTrack *localVideoTrack = nil;
 
@@ -480,7 +465,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
     } else {
         localVideoTrack = [self.peerConnectionFactory videoTrackWithSource:_capturer.delegate trackId:[self videoTrackId]];
     }
-    
+
     AVCaptureDevice *device;
     for (AVCaptureDevice *captureDevice in
          [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
@@ -494,31 +479,31 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
     __weak NBMWebRTCPeer *ws = self;
     [_capturer stopCaptureWithCompletionHandler:^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [ws.capturer startCaptureWithDevice:device format:format fps:30];
-        });
+                           [ws.capturer startCaptureWithDevice:device format:format fps:30];
+                       });
     }];
-    
+
 //    RTCAVFoundationVideoSource* videoSource = [self.peerConnectionFactory avFoundationVideoSourceWithConstraints:videoConstraints];
 //    if (self.cameraPosition == NBMCameraPositionBack) {
 //        [videoSource setUseBackCamera:YES];
 //    }
-    
+
 //    RTCVideoTrack *videoTrack = [self.peerConnectionFactory videoTrackWithSource:videoSource trackId:[self videoTrackId]];
-    
+
     return localVideoTrack;
 }
 
 - (NSString *)cameraDevice:(NBMCameraPosition)cameraPosition
 {
     NSString *cameraID = nil;
-    
-    for (AVCaptureDevice* captureDevice in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
+
+    for (AVCaptureDevice *captureDevice in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
         if (captureDevice.position == (AVCaptureDevicePosition)cameraPosition) {
             cameraID = [captureDevice localizedName];
             break;
         }
     }
-    
+
     return cameraID;
 }
 
@@ -601,14 +586,14 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 
 #pragma mark - RTCPeerConnectionDelegate
 
-- (void)peerConnection:(RTCPeerConnection *)peerConnection
- didChangeSignalingState:(RTCSignalingState)stateChanged {
+- (void)     peerConnection:(RTCPeerConnection *)peerConnection
+    didChangeSignalingState:(RTCSignalingState)stateChanged {
     NBMPeerConnection *connection = [self wrapperForConnection:peerConnection];
     DDLogVerbose(@"Peer connection %@ - signaling state changed: %@", connection.connectionId, [self stringForSignalingState:stateChanged]);
 }
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
-           didAddStream:(RTCMediaStream *)stream {
+          didAddStream:(RTCMediaStream *)stream {
     NBMPeerConnection *connection = [self wrapperForConnection:peerConnection];
     DDLogVerbose(@"%s, Peer connection %@ - received %lu video tracks and %lu audio tracks", __PRETTY_FUNCTION__,
                  connection.connectionId, (unsigned long)stream.videoTracks.count, (unsigned long)stream.audioTracks.count);
@@ -623,7 +608,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 }
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
-         didRemoveStream:(RTCMediaStream *)stream {
+       didRemoveStream:(RTCMediaStream *)stream {
     NBMPeerConnection *connection = [self wrapperForConnection:peerConnection];
     DDLogVerbose(@"Peer connection %@ - stream was removed", connection.connectionId);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -631,7 +616,7 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
             return;
         }
         connection.remoteStream = nil;
-        
+
         [self.delegate webRTCPeer:self didRemoveStream:stream ofConnection:connection];
     });
 }
@@ -641,29 +626,28 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
     DDLogVerbose(@"Peer connection %@ - renegotiation needed but unimplemented", connection.connectionId);
 }
 
-- (void)peerConnection:(RTCPeerConnection *)peerConnection
-  didChangeIceConnectionState:(RTCIceConnectionState)newState {
+- (void)         peerConnection:(RTCPeerConnection *)peerConnection
+    didChangeIceConnectionState:(RTCIceConnectionState)newState {
     NBMPeerConnection *connection = [self wrapperForConnection:peerConnection];
     DDLogVerbose(@"Peer connection %@ - ICE state changed: %@", connection.connectionId, [self stringForConnectionState:newState]);
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!connection) {
             return;
         }
-        
+
         if (newState == RTCIceConnectionStateFailed) {
             connection.iceAttempts++;
             [connection removeRemoteCandidates];
-        }
-        else if (newState == RTCIceConnectionStateConnected) {
+        } else if (newState == RTCIceConnectionStateConnected) {
             connection.iceAttempts = 0;
         }
-        
+
         [self.delegate webrtcPeer:self iceStatusChanged:newState ofConnection:connection];
     });
 }
 
-- (void)peerConnection:(RTCPeerConnection *)peerConnection
-   didChangeIceGatheringState:(RTCIceGatheringState)newState {
+- (void)        peerConnection:(RTCPeerConnection *)peerConnection
+    didChangeIceGatheringState:(RTCIceGatheringState)newState {
     NBMPeerConnection *connection = [self wrapperForConnection:peerConnection];
     DDLogVerbose(@"Peer connection %@ - ICE gathering state changed: %@", connection.connectionId, [self stringForGatheringState:newState]);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -676,22 +660,24 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
     });
 }
 
-- (void)peerConnection:(RTCPeerConnection *)peerConnection
-       didGenerateIceCandidate:(RTCIceCandidate *)candidate {
+- (void)     peerConnection:(RTCPeerConnection *)peerConnection
+    didGenerateIceCandidate:(RTCIceCandidate *)candidate {
     NBMPeerConnection *connection = [self wrapperForConnection:peerConnection];
     DDLogVerbose(@"Peer connection %@ - got ICE candidate", connection.connectionId);
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!connection) {
             return;
         }
-        
+
         [self.delegate webRTCPeer:self hasICECandidate:candidate forConnection:connection];
     });
 }
 
+- (void)peerConnection:(RTCPeerConnection *)peerConnection didRemoveIceCandidates:(NSArray<RTCIceCandidate *> *)candidates {
+}
+
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
     didOpenDataChannel:(RTCDataChannel *)dataChannel {
-
 }
 
 #pragma mark - RTCSessionDescriptionDelegate
@@ -702,12 +688,12 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
         DDLogError(@"Peer connection did create SDP: %@ with error: %@", sdp, error);
         return;
     }
-    
+
     // Send an SDP.
     dispatch_async(dispatch_get_main_queue(), ^{
         DDLogVerbose(@"Peer connection did create %@", sdp.type);
         // Set the local description.
-        
+
         //NBMVideoFormat videoFormat = self.mediaConfiguration.receiverVideoFormat;
         NBMVideoCodec videoCodec = self.mediaConfiguration.videoCodec;
         NSUInteger maxVideoBandwidth = self.mediaConfiguration.videoBandwidth;
@@ -720,8 +706,8 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
                                                                                              videoBandwidth:maxVideoBandwidth
                                                                                              audioBandwidth:maxAudioBandwidth];
 
-        __block __weak RTCPeerConnection* weakPeerConnection = peerConnection;
-        [peerConnection setLocalDescription:conditionedSDP completionHandler:^(NSError * _Nullable error) {
+        __block __weak RTCPeerConnection *weakPeerConnection = peerConnection;
+        [peerConnection setLocalDescription:conditionedSDP completionHandler:^(NSError *_Nullable error) {
             [self peerConnection:weakPeerConnection didSetSessionDescriptionWithError:error];
         }];
         //[peerConnection setLocalDescriptionWithDelegate:self sessionDescription:conditionedSDP];
@@ -733,18 +719,18 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
         DDLogError(@"Peer connection did set SDP with error: %@", error);
         return;
     }
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         DDLogVerbose(@"Peer connection did set session description: %@", peerConnection);
         NBMPeerConnection *connection = [self wrapperForConnection:peerConnection];
         if (!connection) {
             return;
         }
-        
+
         if (peerConnection.iceGatheringState != RTCIceConnectionStateNew) {
             [connection drainRemoteCandidates];
         }
-        
+
         //Send an Offer
         if (peerConnection.signalingState == RTCSignalingStateHaveLocalOffer) {
             RTCSessionDescription *sdpOffer = peerConnection.localDescription;
@@ -754,18 +740,16 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
                 return;
             }
             [self.delegate webRTCPeer:self didGenerateOffer:sdpOffer forConnection:connection];
-        }
-        else if (peerConnection.signalingState == RTCSignalingStateHaveRemoteOffer) {
+        } else if (peerConnection.signalingState == RTCSignalingStateHaveRemoteOffer) {
             // If we're answering and we've just set the remote offer we need to create
             // an answer and set the local description.
             RTCMediaConstraints *answerConstraints = [NBMSessionDescriptionFactory offerConstraints];
-            [peerConnection answerForConstraints:answerConstraints completionHandler:^(RTCSessionDescription * _Nullable sdp, NSError * _Nullable error) {
+            [peerConnection answerForConstraints:answerConstraints completionHandler:^(RTCSessionDescription *_Nullable sdp, NSError *_Nullable error) {
                 [self peerConnection:peerConnection didSetSessionDescriptionWithError:error];
             }];
-            
+
             //[peerConnection createAnswerWithDelegate:self constraints:answerConstraints];
-        }
-        else if (peerConnection.signalingState == RTCSignalingStateStable) {
+        } else if (peerConnection.signalingState == RTCSignalingStateStable) {
             if (!connection.isInitiator) {
                 //An answer is generated
                 RTCSessionDescription *sdpAnswer = peerConnection.localDescription;
@@ -776,9 +760,10 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 }
 
 - (RTCIceServer *)defaultSTUNServer {
-    return [[RTCIceServer alloc] initWithURLStrings:@[kDefaultSTUNServerUrl]
-                                           username:@""
-                                         credential:@""];
+    return [[RTCIceServer alloc] initWithURLStrings:self.defaultServers];
+//    return [[RTCIceServer alloc] initWithURLStrings:@[]
+//                                           username:@""
+//                                         credential:@""];
 }
 
 @end
