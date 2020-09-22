@@ -151,7 +151,7 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
 
 /** The data channel state changed. */
 - (void)dataChannelDidChangeState:(RTCDataChannel *)dataChannel {
-    DDLogVerbose(@"Data channel changed state: @%, %@", dataChannel.label, dataChannel.readyState);
+    DDLogVerbose(@"Data channel changed state: %@, %@", dataChannel.label, @(dataChannel.readyState));
 
     if (dataChannel.readyState == RTCDataChannelStateOpen) {
         [self.delegate webRTCPeer:self didAddDataChannel:dataChannel];

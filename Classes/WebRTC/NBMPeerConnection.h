@@ -18,7 +18,7 @@
 #import <Foundation/Foundation.h>
 
 @class RTCPeerConnection;
-@class RTCICECandidate;
+@class RTCIceCandidate;
 @class RTCMediaStream;
 @class RTCSessionDescription;
 @class RTCDataChannel;
@@ -43,7 +43,7 @@
 @property (nonatomic, assign) NSUInteger iceAttempts;
 
 - (instancetype)initWithConnection:(RTCPeerConnection *)connection;
-- (void)addIceCandidate:(RTCICECandidate *)candidate;
+- (void)addIceCandidate:(RTCIceCandidate *)candidate;
 - (void)drainRemoteCandidates;
 - (void)removeRemoteCandidates;
 - (void)close;

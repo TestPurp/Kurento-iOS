@@ -511,7 +511,9 @@ didReceiveMessageWithBuffer:(RTCDataBuffer *)buffer {
 }
 
 - (void)client:(NBMRoomClient *)client participantEvicted:(NBMPeer *)peer {
-    [self.delegate roomManager:self peerEvicted:peer];
+    if ([self.delegate respondsToSelector:@selector(roomManager:peerEvicted:)]) {
+        [self.delegate roomManager:self peerEvicted:peer];
+    }
 }
 
 - (void)client:(NBMRoomClient *)client participantPublished:(NBMPeer *)peer {
