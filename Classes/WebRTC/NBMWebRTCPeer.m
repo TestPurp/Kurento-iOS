@@ -745,7 +745,8 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
             // an answer and set the local description.
             RTCMediaConstraints *answerConstraints = [NBMSessionDescriptionFactory offerConstraints];
             [peerConnection answerForConstraints:answerConstraints completionHandler:^(RTCSessionDescription *_Nullable sdp, NSError *_Nullable error) {
-                [self peerConnection:peerConnection didSetSessionDescriptionWithError:error];
+//                [self peerConnection:peerConnection didSetSessionDescriptionWithError:error];
+                [self peerConnection:peerConnection didCreateSessionDescription:sdp error:error];
             }];
 
             //[peerConnection createAnswerWithDelegate:self constraints:answerConstraints];
