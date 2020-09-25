@@ -94,7 +94,7 @@
 @end
 
 /**
- *  
+ *
  */
 @interface NBMWebRTCPeer : NSObject
 
@@ -130,13 +130,13 @@
  *
  *  @param connectionId The connection identifier.
  */
-- (void)generateOffer:(NSString *)connectionId completion:(void(^)(NSString *sdpOffer, NBMPeerConnection *connection))block;
+- (void)generateOffer:(NSString *)connectionId completion:(void (^)(NSString *sdpOffer, NBMPeerConnection *connection))block;
 
 - (void)generateOffer:(NSString *)connectionId;
 
 - (void)generateOffer:(NSString *)connectionId withDataChannels:(BOOL)dataChannels;
 
-- (void)generateOffer:(NSString *)connectionId withDataChannels:(BOOL)dataChannels completion:(void(^)(NSString *sdpOffer, NBMPeerConnection *connection))block;
+- (void)generateOffer:(NSString *)connectionId withDataChannels:(BOOL)dataChannels completion:(void (^)(NSString *sdpOffer, NBMPeerConnection *connection))block;
 
 /**
  *  Process a remote offer for connection with specified identifier.

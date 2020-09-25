@@ -691,7 +691,7 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
 
     // Send an SDP.
     dispatch_async(dispatch_get_main_queue(), ^{
-        DDLogVerbose(@"Peer connection did create %@", sdp.type);
+        DDLogVerbose(@"Peer connection did create %@", @(sdp.type));
         // Set the local description.
 
         //NBMVideoFormat videoFormat = self.mediaConfiguration.receiverVideoFormat;
