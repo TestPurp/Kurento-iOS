@@ -81,6 +81,7 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
         connection = [self connectionWrapperWithConnectionId:connectionId servers:_iceServers];
     }
     connection.isInitiator = NO;
+    self.connectionMap[connectionId] = connection;
 
     RTCSessionDescription *description = [[RTCSessionDescription alloc] initWithType:RTCSdpTypeOffer sdp:sdpOffer];
     __block __weak RTCPeerConnection *peerConnection = connection.peerConnection;
@@ -89,7 +90,6 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
     }];
     //[connection.peerConnection setRemoteDescriptionWithDelegate:self sessionDescription:description];
 
-    self.connectionMap[connectionId] = connection;
 
     //TODO:Renegotiate active connections
 }
