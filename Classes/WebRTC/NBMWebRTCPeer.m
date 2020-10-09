@@ -73,10 +73,10 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
     NSParameterAssert(connectionId);
 
     NBMPeerConnection *connection = self.connectionMap[connectionId];
-    //    if (connection) {
-    //        DDLogWarn(@"Connection already exixts - id: %@", connectionId);
-    //        return;
-    //    }
+    if (connection) {
+        DDLogWarn(@"Connection already exixts - id: %@", connectionId);
+        return;
+    }
     if (!connection) {
         connection = [self connectionWrapperWithConnectionId:connectionId servers:_iceServers];
     }
@@ -89,7 +89,6 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
         [self peerConnection:peerConnection didSetSessionDescriptionWithError:error];
     }];
     //[connection.peerConnection setRemoteDescriptionWithDelegate:self sessionDescription:description];
-
 
     //TODO:Renegotiate active connections
 }
@@ -173,6 +172,10 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
 
     NBMPeerConnection *connection = self.connectionMap[connectionId];
     __block __weak RTCPeerConnection *peerConnection = connection.peerConnection;
+    if (peerConnection.remoteDescription) {
+        DDLogWarn(@"remoteDescription already exixts - id: %@", connectionId);
+        return;
+    }
     RTCSessionDescription *description = [[RTCSessionDescription alloc] initWithType:RTCSdpTypeAnswer sdp:sdpAnswer];
     [connection.peerConnection setRemoteDescription:description completionHandler:^(NSError *_Nullable error) {
         [self peerConnection:peerConnection didSetSessionDescriptionWithError:error];
