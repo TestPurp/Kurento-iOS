@@ -20,10 +20,13 @@
 #import <WebRTC/RTCDataChannelConfiguration.h>
 #import <NBMSessionDescriptionFactory.h>
 #import "NBMLog.h"
+#import <WebRTC/RTCIceCandidate.h>
 
 @interface NBMPeerConnection ()
 
 @property (nonatomic, strong) NSMutableArray *queuedRemoteCandidates;
+
+@property (nonatomic, strong) NSMutableArray<RTCIceCandidate *> *cachedRemoteCandidates;
 
 @end
 
@@ -32,13 +35,14 @@
 - (instancetype)initWithConnection:(RTCPeerConnection *)connection
 {
     self = [super init];
-    
+
     if (self) {
         _peerConnection = connection;
         _isInitiator = YES;
         _iceAttempts = 0;
+        _cachedRemoteCandidates = @[].mutableCopy;
     }
-    
+
     return self;
 }
 
@@ -55,7 +59,7 @@
         NBMPeerConnection *otherConnection = (NBMPeerConnection *)object;
         return [otherConnection.peerConnection isEqual:self.peerConnection];
     }
-    
+
     return NO;
 }
 
@@ -63,12 +67,37 @@
     [self close];
 }
 
+#pragma mark - cachedRemoteCandidates check
+- (BOOL)candidateHasAdded:(RTCIceCandidate *)candidate {
+    NSUInteger index = [_cachedRemoteCandidates indexOfObjectPassingTest:^BOOL (RTCIceCandidate *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
+        if ([obj.sdp isEqualToString:candidate.sdp]
+            && obj.sdpMLineIndex == candidate.sdpMLineIndex) {
+            if (candidate.sdpMid) {
+                if ([candidate.sdpMid isEqualToString:obj.sdpMid]) {
+                    return YES;
+                }
+            }else {
+                if (!obj.sdpMid) {
+                    return YES;
+                }
+            }
+        }
+        return NO;
+    }];
+    return index != NSNotFound;
+}
+
 #pragma mark - Public
 
 - (void)addIceCandidate:(RTCIceCandidate *)candidate
 {
-    BOOL queueCandidates = self.peerConnection == nil || self.peerConnection.signalingState != RTCSignalingStateStable;
+    if ([self candidateHasAdded:candidate]) {
+        return;
+    }
+    [_cachedRemoteCandidates addObject:candidate];
     
+    BOOL queueCandidates = self.peerConnection == nil || self.peerConnection.signalingState != RTCSignalingStateStable;
+
     if (queueCandidates) {
         if (!self.queuedRemoteCandidates) {
             self.queuedRemoteCandidates = [NSMutableArray array];
@@ -84,7 +113,7 @@
 - (void)drainRemoteCandidates
 {
     DDLogVerbose(@"Drain %lu remote ICE candidates.", (unsigned long)[self.queuedRemoteCandidates count]);
-    
+
     for (RTCIceCandidate *candidate in self.queuedRemoteCandidates) {
         [self.peerConnection addIceCandidate:candidate];
     }
@@ -94,7 +123,7 @@
 - (void)removeRemoteCandidates
 {
     DDLogDebug(@"%s", __PRETTY_FUNCTION__);
-    
+
     [self.queuedRemoteCandidates removeAllObjects];
     self.queuedRemoteCandidates = nil;
 }
@@ -106,8 +135,9 @@
         [self.peerConnection removeStream:localStream];
     }
     [self.peerConnection close];
-    
+    self.cachedRemoteCandidates = nil;
     self.remoteStream = nil;
     self.peerConnection = nil;
 }
+
 @end
