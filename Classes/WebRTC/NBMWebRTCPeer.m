@@ -43,7 +43,7 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
 @property (nonatomic, strong) RTCCameraVideoCapturer *capturer;
 
 @property (nonatomic, copy) SdpOfferBlock offerBlock;
-@property (nonatomic, copy) NSArray<NSString *> *defaultServers;
+//@property (nonatomic, copy) NSArray<NSString *> *defaultServers;
 
 @end
 
@@ -51,7 +51,7 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
 
 #pragma mark - Public
 
-- (instancetype)initWithDelegate:(id<NBMWebRTCPeerDelegate>)delegate configuration:(NBMMediaConfiguration *)configuration stunServers:(NSArray<NSString *> *)servers
+- (instancetype)initWithDelegate:(id<NBMWebRTCPeerDelegate>)delegate configuration:(NBMMediaConfiguration *)configuration stunServers:(NSArray<RTCIceServer *> *)servers
 {
     self = [super init];
 
@@ -60,8 +60,9 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
         _mediaConfiguration = configuration;
 
         _peerConnectionFactory = [[RTCPeerConnectionFactory alloc] init];
-        self.defaultServers = servers;
-        _iceServers = [NSMutableArray arrayWithObject:[self defaultSTUNServer]];
+//        self.defaultServers = servers;
+        _iceServers = servers.mutableCopy;
+//        [NSMutableArray arrayWithObject:[self defaultSTUNServer]];
         _connectionMap = [NSMutableDictionary dictionary];
     }
 
@@ -763,11 +764,11 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
     });
 }
 
-- (RTCIceServer *)defaultSTUNServer {
-    return [[RTCIceServer alloc] initWithURLStrings:self.defaultServers];
-//    return [[RTCIceServer alloc] initWithURLStrings:@[]
-//                                           username:@""
-//                                         credential:@""];
-}
+//- (RTCIceServer *)defaultSTUNServer {
+//    return [[RTCIceServer alloc] initWithURLStrings:self.defaultServers];
+////    return [[RTCIceServer alloc] initWithURLStrings:@[]
+////                                           username:@""
+////                                         credential:@""];
+//}
 
 @end

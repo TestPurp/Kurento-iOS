@@ -123,7 +123,7 @@
  *
  *  @return An initialized Web RTC peer manager.
  */
-- (instancetype)initWithDelegate:(id<NBMWebRTCPeerDelegate>)delegate configuration:(NBMMediaConfiguration *)configuration stunServers:(NSArray<NSString *> *)servers;
+- (instancetype)initWithDelegate:(id<NBMWebRTCPeerDelegate>)delegate configuration:(NBMMediaConfiguration *)configuration stunServers:(NSArray<RTCIceServer *> *)servers;
 
 /**
  *  Create a new offer for connection with specified identifier.
