@@ -265,6 +265,12 @@ typedef void (^SdpOfferBlock)(NSString *sdpOffer, NBMPeerConnection *connection)
 
 - (void)enableVideo:(BOOL)enable {
     [self.localStream setVideoEnabled:enable];
+    if (!enable) {
+        [self.capturer stopCapture];
+        self.capturer = nil;
+        [self.localStream removeVideoTrack:[self.localStream.videoTracks firstObject]];
+
+    }
 }
 
 - (BOOL)isAudioEnabled {
